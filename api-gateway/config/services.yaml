@@ -1,0 +1,27 @@
+parameters:
+    product_service_url: '%env(PRODUCT_SERVICE_URL)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+
+    # HealthChecks به جز ProductServiceHealth
+    App\HealthCheck\:
+        resource: '../src/HealthCheck/*'
+        exclude: '../src/HealthCheck/ProductServiceHealth.php'
+        tags: ['app.health_checker']
+
+    # ProductServiceHealth با URL
+    App\HealthCheck\ProductServiceHealth:
+        arguments:
+            $url: '%env(PRODUCT_SERVICE_URL)%'
+        tags: ['app.health_checker']
+
+    # Aggregator
+    App\HealthCheck\HealthAggregator:
+        arguments:
+            - !tagged_iterator 'app.health_checker'
