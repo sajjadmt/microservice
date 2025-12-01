@@ -2,8 +2,6 @@
 
 namespace App\HealthCheck;
 
-use App\HealthCheck\HealthCheckInterface;
-
 class ApiGatewayHealth implements HealthCheckInterface
 {
 
