@@ -2,10 +2,11 @@
 
 namespace App\HealthCheck;
 
+use App\HealthCheck\HealthCheckInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ProductServiceHealth implements HealthCheckInterface
+class UserServiceHealth implements HealthCheckInterface
 {
 
     public function __construct(private HttpClientInterface $httpClient, private string $url)
@@ -17,27 +18,23 @@ class ProductServiceHealth implements HealthCheckInterface
         $start = microtime(true);
 
         try {
-            $response = $this->httpClient->request('GET',$this->url . '/health',[
+            $response = $this->httpClient->request('GET', $this->url . '/health', [
                 'timeout' => 5,
             ]);
-
-            $time = round((microtime(true) - $start) * 1000,2);
-
-            if ($response->getStatusCode() === 200){
+            $time = round((microtime(true) - $start) * 1000, 2);
+            if ($response->getStatusCode() === 200) {
                 $data = $response->toArray();
                 return [
                     'status' => $data['status'] ?? 'unknown',
-                    'time' => $time
+                    'time'=> $time,
                 ];
             }
-
             return [
                 'status' => 'unhealthy',
                 'time' => $time,
                 'error' => 'Bad HTTP Status'
             ];
-
-        }catch (ExceptionInterface $exception){
+        } catch (ExceptionInterface $exception) {
             return [
                 'status' => 'unhealthy',
                 'time' => round((microtime(true) - $start) * 1000, 2),
@@ -48,6 +45,6 @@ class ProductServiceHealth implements HealthCheckInterface
 
     public function getServiceName(): string
     {
-        return 'Product Service';
+        return 'User Service';
     }
 }

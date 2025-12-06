@@ -1,24 +1,34 @@
 parameters:
     product_service_url: '%env(PRODUCT_SERVICE_URL)%'
+    user_service_url: '%env(USER_SERVICE_URL)%'
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
 
+    # اسکن خودکار کل پوشه src/
     App\:
         resource: '../src/'
 
-    # HealthChecks به جز ProductServiceHealth
+    # HealthChecks به جز فایل‌هایی که دستی مقداردهی می‌کنیم
     App\HealthCheck\:
         resource: '../src/HealthCheck/*'
-        exclude: '../src/HealthCheck/ProductServiceHealth.php'
+        exclude:
+            - '../src/HealthCheck/ProductServiceHealth.php'
+            - '../src/HealthCheck/UserServiceHealth.php'
         tags: ['app.health_checker']
 
-    # ProductServiceHealth با URL
+    # ProductServiceHealth - تزریق URL از .env
     App\HealthCheck\ProductServiceHealth:
         arguments:
             $url: '%env(PRODUCT_SERVICE_URL)%'
+        tags: ['app.health_checker']
+
+    # UserServiceHealth - تزریق URL از .env
+    App\HealthCheck\UserServiceHealth:
+        arguments:
+            $url: '%env(USER_SERVICE_URL)%'
         tags: ['app.health_checker']
 
     # Aggregator
